@@ -4,7 +4,7 @@ pragma solidity >=0.8.2 <0.9.0;
 
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
-contract  Vote is Ownable {
+contract  Voting is Ownable {
     struct Voter {
         bool isRegistered;
         bool hasVoted;
@@ -28,17 +28,24 @@ contract  Vote is Ownable {
 
     Proposal newPorosal;
     Voter currentVote = Voter(false,false,0);
-    Vote.Session currentSession;
+    Voting.Session currentSession;
     Proposal winner;
+    mapping (address =>Voter) public whitelist;
     
-    address[] whitelist;
     event newProposition(Proposal);
     event etatSession(Session);
-   
     
-    
+    modifier isWhiteList {
+        require( whitelist[msg.sender] ,"is not whitelisted");
+        _;
+    }
+    function addVoter(address _address)public onlyOwner() {
+        require(!whitelist[_address].isRegistered);
+        whitelist[_address]=Voter(true,false,0);
+    }
 
     function startSession(bool _publicProposal) public onlyOwner pure{
+        whitelist[owner()] = true;
         currentSession.etat=etat.register;
         currentSession.isPublicProposal=_publicProposal;
         emit etatSession(currentSession);
@@ -61,15 +68,15 @@ contract  Vote is Ownable {
     }
 
     function setVote(uint _ProposalId) public{
-        require(FindInWhiteList(msg.sender) && currentSession.etat==etat.vote &&!currentVote.hasVoted );
+        require(whitelist[msg.sender]&& currentSession.etat==etat.vote &&!currentVote.hasVoted );
         currentSession.lesProposition[_ProposalId].voteCount+=1;
         currentVote.hasVoted=true;
         
     }
-    function proposer(string calldata _description ) public {
+    function proposer(string calldata _description ) isWhiteList public {
         if(currentSession.isPublicProposal || _checkOwner()){
             require(
-                FindInWhiteList(msg.sender) && currentSession.etat == etat.register
+                currentSession.etat == etat.register
             );
             newPorosal = Proposal(_description, 0);
             currentSession.lesProposition.push(newPorosal);
@@ -89,7 +96,7 @@ contract  Vote is Ownable {
         }
         
     }
-     function getSession()public view returns (Vote.Session calldata){
+     function getSession()public view returns (Voting.Session calldata){
         return currentSession;
     }
     function getWinner()public view  returns(Proposal calldata){
