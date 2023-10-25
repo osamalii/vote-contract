@@ -95,6 +95,4 @@ contract  Vote is Ownable {
     function getWinner()public view  returns(Proposal calldata){
         return winner;
     }
-trux
-trux
 }
