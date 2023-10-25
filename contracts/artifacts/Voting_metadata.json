@@ -1,6 +1,6 @@
 {
 	"compiler": {
-		"version": "0.8.21+commit.d9974bed"
+		"version": "0.8.20+commit.a1b79de6"
 	},
 	"language": "Solidity",
 	"output": {
@@ -50,42 +50,19 @@
 				"anonymous": false,
 				"inputs": [
 					{
-						"components": [
-							{
-								"internalType": "enum Voting.etat",
-								"name": "etat",
-								"type": "uint8"
-							},
-							{
-								"internalType": "bool",
-								"name": "isPublicProposal",
-								"type": "bool"
-							},
-							{
-								"components": [
-									{
-										"internalType": "string",
-										"name": "description",
-										"type": "string"
-									},
-									{
-										"internalType": "uint256",
-										"name": "voteCount",
-										"type": "uint256"
-									}
-								],
-								"internalType": "struct Voting.Proposal[]",
-								"name": "lesProposition",
-								"type": "tuple[]"
-							}
-						],
 						"indexed": false,
-						"internalType": "struct Voting.Session",
-						"name": "",
-						"type": "tuple"
+						"internalType": "enum Voting.WorkflowStatus",
+						"name": "previousStatus",
+						"type": "uint8"
+					},
+					{
+						"indexed": false,
+						"internalType": "enum Voting.WorkflowStatus",
+						"name": "newStatus",
+						"type": "uint8"
 					}
 				],
-				"name": "etatSession",
+				"name": "WorkflowStatusChange",
 				"type": "event"
 			},
 			{
@@ -154,8 +131,8 @@
 					{
 						"components": [
 							{
-								"internalType": "enum Voting.etat",
-								"name": "etat",
+								"internalType": "enum Voting.WorkflowStatus",
+								"name": "status",
 								"type": "uint8"
 							},
 							{
@@ -389,11 +366,11 @@
 			]
 		},
 		"contracts/Voting.sol": {
-			"keccak256": "0x7c466241db5724065ec261ee51723f561542566860db4cc44941e377d8d06bd4",
+			"keccak256": "0x41be0247b65085bf93b70d75f13c23d4537d5b59aeadc1f42348025b99aa2af1",
 			"license": "GPL-3.0",
 			"urls": [
-				"bzz-raw://c54600fe83f77d42d1d4724ca54512ea61f43f9e0c2cd072e121212ee711ac0f",
-				"dweb:/ipfs/QmaRf73hgUnLPuxa62BTBSdJcRWrX6nddRXTosYsG5HDFU"
+				"bzz-raw://7f3d2643ee8bce09ff34c2458f8f782d94027f119d3ee0d90d0dc32dbae29d46",
+				"dweb:/ipfs/QmVsBp5BYtFDYAWakadyidC9MR4vSmTqX7w1Zg7XDEiBsY"
 			]
 		}
 	},
