@@ -2,9 +2,9 @@
 
 pragma solidity >=0.8.2 <0.9.0;
 
-import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
-contract  Voting is Ownable {
+contract  Voting is Ownable(msg.sender) {
     struct Voter {
         bool isRegistered;
         bool hasVoted;
@@ -36,7 +36,7 @@ contract  Voting is Ownable {
     event etatSession(Session);
     
     modifier isWhiteList {
-        require( whitelist[msg.sender] ,"is not whitelisted");
+        require( whitelist[msg.sender].isRegistered ,"is not whitelisted");
         _;
     }
     function addVoter(address _address)public onlyOwner() {
@@ -44,37 +44,37 @@ contract  Voting is Ownable {
         whitelist[_address]=Voter(true,false,0);
     }
 
-    function startSession(bool _publicProposal) public onlyOwner pure{
-        whitelist[owner()] = true;
+    function startSession(bool _publicProposal) public onlyOwner {
+        whitelist[owner()].isRegistered=true;
         currentSession.etat=etat.register;
         currentSession.isPublicProposal=_publicProposal;
         emit etatSession(currentSession);
     }
 
-    function closeProposition() public onlyOwner pure{
+    function closeProposition() public onlyOwner {
         require(currentSession.etat==etat.register,"Session need be in register status before");
         currentSession.etat = etat.closeregister;
         emit etatSession(currentSession);
     }
-    function openVote() public onlyOwner pure {
+    function openVote() public onlyOwner  {
         require(currentSession.etat==etat.closeregister,"Session need be in closeregister status before");
         currentSession.etat = etat.vote;
         emit etatSession(currentSession);
     }
-    function closeVote() public onlyOwner pure {
+    function closeVote() public onlyOwner  {
         require(currentSession.etat==etat.vote,"Session need be in vote status before");
         currentSession.etat = etat.closevote;
         emit etatSession(currentSession);
     }
 
     function setVote(uint _ProposalId) public{
-        require(whitelist[msg.sender]&& currentSession.etat==etat.vote &&!currentVote.hasVoted );
+        require(whitelist[msg.sender].isRegistered&& currentSession.etat==etat.vote &&!currentVote.hasVoted );
         currentSession.lesProposition[_ProposalId].voteCount+=1;
         currentVote.hasVoted=true;
         
     }
     function proposer(string calldata _description ) isWhiteList public {
-        if(currentSession.isPublicProposal || _checkOwner()){
+        if(currentSession.isPublicProposal || owner()==msg.sender){
             require(
                 currentSession.etat == etat.register
             );
@@ -84,7 +84,7 @@ contract  Voting is Ownable {
         }
     }
 
-    function contabiliserVote()public onlyOwner  view{
+    function contabiliserVote()public onlyOwner {
         uint i=1;
         uint max =currentSession.lesProposition[0].voteCount;
         winner=currentSession.lesProposition[0];
@@ -96,10 +96,10 @@ contract  Voting is Ownable {
         }
         
     }
-     function getSession()public view returns (Voting.Session calldata){
+     function getSession()public view returns (Voting.Session memory){
         return currentSession;
     }
-    function getWinner()public view  returns(Proposal calldata){
+    function getWinner()public view  returns(Proposal memory){
         return winner;
     }
 }
