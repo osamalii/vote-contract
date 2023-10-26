@@ -40,6 +40,8 @@ contract  Voting is Ownable(msg.sender) {
     
     event newProposition(Proposal);
     event WorkflowStatusChange(WorkflowStatus previousStatus, WorkflowStatus newStatus);
+    event ProposalRegistered(uint proposalId);
+    event Voted (address voter, uint proposalId);
     
     modifier isWhiteList {
         require( whitelist[msg.sender].isRegistered ,"is not whitelisted");
@@ -62,7 +64,7 @@ contract  Voting is Ownable(msg.sender) {
     }
 
     function closeProposition() public onlyOwner {
-        require(currentSession.status==WorkflowStatus.ProposalsRegistrationStarted,"Session need be in register status before");
+        require(currentSession.status == WorkflowStatus.ProposalsRegistrationStarted, "Session need be in register status before");
         emit WorkflowStatusChange(currentSession.status, WorkflowStatus.ProposalsRegistrationEnded);
         currentSession.status = WorkflowStatus.ProposalsRegistrationEnded;
     }
@@ -81,6 +83,7 @@ contract  Voting is Ownable(msg.sender) {
         require(currentSession.status == WorkflowStatus.VotingSessionStarted && !currentVote.hasVoted);
         currentSession.lesProposition[_ProposalId].voteCount += 1;
         currentVote.hasVoted = true;
+        emit Voted(msg.sender, _ProposalId)
         
     }
     function proposer(string calldata _description ) isWhiteList public {
@@ -90,7 +93,7 @@ contract  Voting is Ownable(msg.sender) {
             );
             newPorosal = Proposal(_description, 0);
             currentSession.lesProposition.push(newPorosal);
-            emit newProposition(newPorosal);
+            emit ProposalRegistered(currentSession.lesProposition.length - 1);
         }
     }
 
