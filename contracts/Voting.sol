@@ -38,7 +38,6 @@ contract  Voting is Ownable(msg.sender) {
     Proposal winner;
     mapping (address => Voter) public whitelist;
     
-    event newProposition(Proposal);
     event WorkflowStatusChange(WorkflowStatus previousStatus, WorkflowStatus newStatus);
     event ProposalRegistered(uint proposalId);
     event Voted (address voter, uint proposalId);
